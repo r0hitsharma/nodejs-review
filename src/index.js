@@ -1,4 +1,14 @@
-import { hello, helloWorld } from './my_functions';
+import { Contact, ContactList } from './ContactList';
 
-helloWorld();
-hello("marco");
+let james = new Contact({
+	name: "james"
+});
+// console.log(james);
+
+let contacts = new ContactList("./src/contacts.json");
+
+contacts.load()
+.then(() => {
+	contacts.addContact(james);
+	console.log(contacts);
+})
