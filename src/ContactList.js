@@ -15,7 +15,9 @@ class Contact {
 		this.name = obj.name;
 		this.phone = obj.phone;
 		if(obj.cars)
-			this.cars = obj.cars.map(car => new Car(car));
+			this.cars = obj.cars.map(carObj => {
+				return carObj? new Car(carObj): null;
+			});
 		else
 			this.cars = [];
 	}
