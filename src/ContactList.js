@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as util from "util";
 
-// import { Car } from './Car';
+import { Car } from './Car';
 
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
@@ -14,7 +14,10 @@ class Contact {
 
 		this.name = obj.name;
 		this.phone = obj.phone;
-		this.cars = obj.cars || [];
+		if(obj.cars)
+			this.cars = obj.cars.map(car => new Car(car));
+		else
+			this.cars = [];
 	}
 
 	set name (name){

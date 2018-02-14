@@ -97,7 +97,20 @@ app.delete("/contacts/:id", (req, res) => {
 	.catch(err => res.status(500).send(err));
 });
 
-// app.get("/contacts/:id/cars")
+app.get("/contacts/:id/cars", (req, res) => {
+	const id = req.params.id;
+
+	contacts.load()
+	.then(() => {
+		const contact = contacts.list[id - 1];
+
+		if(!contact)
+			return res.status(404).send("Contact does not exist");
+
+		res.json(contact.cars);
+	})
+	.catch(err => res.status(400).send(err));
+})
 
 app.post("/contacts/:id/cars", (req, res) => {
 	const id = req.params.id;
@@ -115,7 +128,7 @@ app.post("/contacts/:id/cars", (req, res) => {
 		return contacts.save();
 	})
 	.then(() => {
-		res.send(car);
+		res.json(car);
 	})
-	.catch(err => res.status(400).send(err))
+	.catch(err => res.status(400).send(err));
 });
