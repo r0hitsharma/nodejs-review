@@ -53,7 +53,7 @@ app.post("/contacts", (req, res) => {
 		return contacts.save();
 	})
 	.then(() => {
-		res.status(201).send("New contact created");
+		res.status(201).send(contact);
 	})
 	.catch(err => res.status(400).send(err));
 });
@@ -77,4 +77,21 @@ app.put("/contacts/:id", (req, res) => {
 		res.send(contact);
 	})
 	.catch(err => res.status(400).send(err));
+});
+
+app.delete("/contacts/:id", (req, res) => {
+	const id = req.params.id;
+	let contact = null;
+	contacts.load()
+	.then(() => {
+		contact = contacts.list[req.params.id - 1];
+		if(!contact)
+			return res.status(404).send("Contact does not exist");
+		
+		contacts.list[req.params.id - 1] = null;
+
+		return contacts.save();
+	})
+	.then(() => res.json(contact))
+	.catch(err => res.status(500).send(err));
 });
