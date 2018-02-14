@@ -1,4 +1,5 @@
 import express from "express";
+import bodyParser from "body-parser";
 
 import { Contact, ContactList } from './ContactList';
 
@@ -17,6 +18,9 @@ app.use((req, res, next) => {
 	next();
 });
 
+// parsing json bodies
+app.use(bodyParser.json());
+
 app.get("/", (req, res) => {
 	res.send("Welcome to our server!");
 });
@@ -26,7 +30,7 @@ app.get("/contacts", (req, res) => {
 	.then(() => {
 		res.json(contacts.list);
 	})
-	.catch(() => res.status(500).send(err));
+	.catch(err => res.status(500).send(err));
 });
 
 app.get("/contacts/:id", (req, res) => {
@@ -38,5 +42,39 @@ app.get("/contacts/:id", (req, res) => {
 			return res.status(404).send("Contact does not exist");
 		res.json(contact);
 	})
-	.catch(() => res.status(500).send(err));
+	.catch(err => res.status(500).send(err));
+});
+
+app.post("/contacts", (req, res) => {
+	let contact = new Contact(req.body);
+	contacts.load()
+	.then(() => {
+		contacts.addContact(contact);
+		return contacts.save();
+	})
+	.then(() => {
+		res.status(201).send("New contact created");
+	})
+	.catch(err => res.status(400).send(err));
+});
+
+app.put("/contacts/:id", (req, res) => {
+	const id = req.params.id;
+	const contact = new Contact(req.body);
+
+	contacts.load()
+	.then(() => {
+		const oldContact = contacts.list[id - 1];
+
+		if(!oldContact)
+			return res.status(404).send("Contact does not exist");
+
+		contacts.list[id - 1] = contact;
+
+		return contacts.save();
+	})
+	.then(() => {
+		res.send(contact);
+	})
+	.catch(err => res.status(400).send(err));
 });
