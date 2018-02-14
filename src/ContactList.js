@@ -1,6 +1,8 @@
 import * as fs from "fs";
 import * as util from "util";
 
+// import { Car } from './Car';
+
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
 
@@ -12,6 +14,7 @@ class Contact {
 
 		this.name = obj.name;
 		this.phone = obj.phone;
+		this.cars = obj.cars || [];
 	}
 
 	set name (name){
@@ -31,7 +34,8 @@ class Contact {
 	toJSON (){
 		return {
 			name: this._name,
-			phone: this.phone
+			phone: this.phone,
+			cars: this.cars
 		};
 	}
 };
@@ -53,7 +57,10 @@ class ContactList {
 		.then(fileString => {
 			// console.log(fileString);
 			JSON.parse(fileString)
-			.forEach(contact => this.addContact(contact));
+			.forEach(contactObj => {
+				const contact = contactObj ?new Contact(contactObj) : null;
+				this.addContact(contact);
+			});
 		})
 	}
 

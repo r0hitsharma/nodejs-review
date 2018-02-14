@@ -2,6 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 
 import { Contact, ContactList } from './ContactList';
+import { Car } from './Car';
 
 let contacts = new ContactList("./src/contacts.json");
 
@@ -94,4 +95,27 @@ app.delete("/contacts/:id", (req, res) => {
 	})
 	.then(() => res.json(contact))
 	.catch(err => res.status(500).send(err));
+});
+
+// app.get("/contacts/:id/cars")
+
+app.post("/contacts/:id/cars", (req, res) => {
+	const id = req.params.id;
+	const car = new Car(req.body);
+
+	contacts.load()
+	.then(() => {
+		const contact = contacts.list[id - 1];
+
+		if(!contact)
+			return res.status(404).send("Contact does not exist");
+
+		contact.cars.push(car);
+
+		return contacts.save();
+	})
+	.then(() => {
+		res.send(car);
+	})
+	.catch(err => res.status(400).send(err))
 });
