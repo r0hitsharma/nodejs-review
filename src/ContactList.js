@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as util from "util";
 
 const readFile = util.promisify(fs.readFile);
+const writeFile = util.promisify(fs.writeFile);
 
 class Contact {
 	constructor (obj){
@@ -29,6 +30,14 @@ class ContactList {
 			JSON.parse(fileString)
 			.forEach(contact => this.addContact(contact));
 		})
+	}
+
+	save(){
+		return writeFile(
+			this.filename,
+			JSON.stringify(this.list),
+			"utf8"
+		)
 	}
 }
 

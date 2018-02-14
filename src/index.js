@@ -10,5 +10,10 @@ let contacts = new ContactList("./src/contacts.json");
 contacts.load()
 .then(() => {
 	contacts.addContact(james);
-	console.log(contacts);
+	// console.log(contacts);
+	return contacts.save();
 })
+.then(() => {
+	console.log("Contacts save successfully.")
+})
+.catch(console.log);
