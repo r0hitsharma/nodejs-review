@@ -28,3 +28,15 @@ app.get("/contacts", (req, res) => {
 	})
 	.catch(() => res.status(500).send(err));
 });
+
+app.get("/contacts/:id", (req, res) => {
+	const id = req.params.id;
+	contacts.load()
+	.then(() => {
+		const contact = contacts.list[req.params.id - 1];
+		if(!contact)
+			return res.status(404).send("Contact does not exist");
+		res.json(contact);
+	})
+	.catch(() => res.status(500).send(err));
+});
