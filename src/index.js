@@ -2,6 +2,8 @@ import express from "express";
 
 import { Contact, ContactList } from './ContactList';
 
+let contacts = new ContactList("./src/contacts.json");
+
 const port = 8080;
 const app = express();
 
@@ -13,27 +15,10 @@ app.get("/", (req, res) => {
 	res.send("Welcome to our server!");
 });
 
-let james = new Contact({
-	name: "james"
+app.get("/contacts", (req, res) => {
+	contacts.load()
+	.then(() => {
+		res.json(contacts.list);
+	})
+	.catch(() => res.status(500).send(err));
 });
-// console.log(james);
-
-let contacts = new ContactList("./src/contacts.json");
-
-let validContact = new Contact({
-	name: "some name",
-	phone: 228131
-});
-// validContact.name = 53;
-console.log(JSON.stringify(validContact));
-
-// contacts.load()
-// .then(() => {
-// 	contacts.addContact(james);
-// 	// console.log(contacts);
-// 	return contacts.save();
-// })
-// .then(() => {
-// 	console.log("Contacts save successfully.")
-// })
-// .catch(console.log);
