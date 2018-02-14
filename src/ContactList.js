@@ -47,6 +47,8 @@ class ContactList {
 	}
 
 	load(){
+		this.list = [];
+
 		return readFile(this.filename, "utf8")
 		.then(fileString => {
 			// console.log(fileString);
