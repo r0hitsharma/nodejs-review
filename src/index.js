@@ -132,3 +132,26 @@ app.post("/contacts/:id/cars", (req, res) => {
 	})
 	.catch(err => res.status(400).send(err));
 });
+
+app.get("/contacts/:id/cars/:carId", (req, res) => {
+	const id = req.params.id;
+	const carId = req.params.carId;
+
+	contacts.load()
+	.then(() => {
+		const contact = contacts.list[id - 1];
+
+		if(!contact)
+			return res.status(404).send("Contact does not exist");
+
+		const car = contact.cars[carId - 1];
+
+		if(!car)
+			return res.status(404).send("Car does not exist");
+
+		res.json(car);
+	})
+	.catch(err => res.status(400).send(err));
+});
+
+// app.delete("/contacts/:id/cars/:carId", (req, res) => {});
