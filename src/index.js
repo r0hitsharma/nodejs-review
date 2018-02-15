@@ -32,6 +32,36 @@ app.use((req, res, next) => {
 	.catch(err => next(err));
 });
 
+// fetch contact based on contact id
+app.use("/contacts/:id", (req, res, next) => {
+	console.log("Contact:", req.params.id);
+	if(req.params.id){
+		const contact = req.contacts.list[req.params.id - 1];
+		if(!contact)
+			return res.status(404).send("Contact does not exist");
+		req.contact = contact;
+	}
+
+	next();
+});
+
+// fetch car based on car id
+app.use("/contacts/:id/cars/:carId", (req, res, next) => {
+	console.log("Car:", req.params.carId);
+
+	if(req.params.carId){
+		const carId = req.params.carId;
+
+		const car = req.contact.cars[carId - 1];
+
+		if(!car)
+			return res.status(404).send("Car does not exist");
+		req.car = car;
+	}
+
+	next();
+});
+
 app.get("/", (req, res) => {
 	res.send("Welcome to our server!");
 });
@@ -41,11 +71,7 @@ app.get("/contacts", (req, res) => {
 });
 
 app.get("/contacts/:id", (req, res) => {
-	const id = req.params.id;
-	const contact = req.contacts.list[req.params.id - 1];
-	if(!contact)
-		return res.status(404).send("Contact does not exist");
-	res.json(contact);
+	res.json(req.contact);
 });
 
 app.post("/contacts", (req, res) => {
@@ -64,11 +90,6 @@ app.put("/contacts/:id", (req, res) => {
 	const id = req.params.id;
 	const contact = new Contact(req.body);
 
-	const oldContact = req.contacts.list[id - 1];
-
-	if(!oldContact)
-		return res.status(404).send("Contact does not exist");
-
 	req.contacts.list[id - 1] = contact;
 
 	req.contacts.save()
@@ -80,10 +101,6 @@ app.put("/contacts/:id", (req, res) => {
 
 app.delete("/contacts/:id", (req, res) => {
 	const id = req.params.id;
-	let contact = req.contacts.list[req.params.id - 1];
-
-	if(!contact)
-		return res.status(404).send("Contact does not exist");
 	
 	req.contacts.list[req.params.id - 1] = null;
 
@@ -93,26 +110,13 @@ app.delete("/contacts/:id", (req, res) => {
 });
 
 app.get("/contacts/:id/cars", (req, res) => {
-	const id = req.params.id;
-
-	const contact = req.contacts.list[id - 1];
-
-	if(!contact)
-		return res.status(404).send("Contact does not exist");
-
-	res.json(contact.cars);
+	res.json(req.contact.cars);
 })
 
 app.post("/contacts/:id/cars", (req, res) => {
-	const id = req.params.id;
 	const car = new Car(req.body);
 
-	const contact = req.contacts.list[id - 1];
-
-	if(!contact)
-		return res.status(404).send("Contact does not exist");
-
-	contact.cars.push(car);
+	req.contact.cars.push(car);
 
 	req.contacts.save()
 	.then(() => {
@@ -122,42 +126,16 @@ app.post("/contacts/:id/cars", (req, res) => {
 });
 
 app.get("/contacts/:id/cars/:carId", (req, res) => {
-	const id = req.params.id;
-	const carId = req.params.carId;
-
-	const contact = req.contacts.list[id - 1];
-
-	if(!contact)
-		return res.status(404).send("Contact does not exist");
-
-	const car = contact.cars[carId - 1];
-
-	if(!car)
-		return res.status(404).send("Car does not exist");
-
-	res.json(car);
+	res.json(req.car);
 });
 
 app.delete("/contacts/:id/cars/:carId", (req, res) => {
-	const id = req.params.id;
 	const carId = req.params.carId;
-	let car = null;
-
-	const contact = req.contacts.list[id - 1];
-
-	if(!contact)
-		return res.status(404).send("Contact does not exist");
-
-	car = contact.cars[carId - 1];
-
-	if(!car)
-		return res.status(404).send("Car does not exist");
-
-	contact.cars[carId - 1] = null;
+	req.contact.cars[carId - 1] = null;
 
 	req.contacts.save()
 	.then(() => {
-		res.json(car);
+		res.json(req.car);
 	})
 	.catch(err => res.status(400).send(err));
 });
